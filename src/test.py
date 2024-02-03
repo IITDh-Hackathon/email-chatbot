@@ -1,6 +1,7 @@
 from textual.app import App, ComposeResult
 from textual.widgets import Static,Collapsible, Footer, Label, Markdown, DataTable
 from textual.containers import ScrollableContainer
+from utils.events import *
 
 LETO = """\
 # Duke Leto I Atreides
@@ -19,12 +20,13 @@ PAUL = """
 Son of Leto and Jessica.
 """
 
-Rows=[
-    ("Event" , "Time"),
-    ("Event 1", "10:00 Feb 20 2021"),
-    ("Event 2", "11:00 Feb 20 2021"),
-    ("Event 3", "12:00 Feb 20 2021")
-]
+Rows=[("Event" , "Time")]
+
+all_events = get_events()
+
+for event in all_events:
+    Rows.append((event["Event"],event["Time"]))
+
 
 class TableApp(Static):
     def compose(self) -> ComposeResult:
