@@ -48,36 +48,39 @@ class Mail(Base):
     def __repr__(self):
         return f"<Mail(message_id={self.message_id}, sender={self.sender}, recipient={self.recipient}, subject={self.subject}, date={self.date}, message={self.message})>"
 
+def add_to_db(emails):
+    for email in emails:
+        mail = Mail(
+            message_id=email.id,
+            thread_id=email.thread_id,
+            sender=email.sender,
+            recipient=email.recipient,
+            subject=email.subject,
+            date=email.date,
+            message=email.plain,
+            # labels=str(email.labels)
+        )
+        session.add(mail)
+        session.commit()
 
 
-def sync_emails(gmail):
-    # messages = gmail.get_unread_messages(query=construct_query(query_params))
+
+def sync_emails(gmail_client : Gmail):
     query_params = {
         "newer_than": (2, "day"),
     }
-    emails = gmail.get_messages(query=construct_query(query_params))
+    emails = gmail_client.get_messages(query=construct_query(query_params))
 
-    for message in emails:
-        mail = Mail(
-            message_id=str(message.id),
-            thread_id=str(message.thread_id),
-            sender=message.sender,
-            recipient=message.recipient,
-            subject=message.subject,
-            date=message.date,
-            message=message.plain,
-            # labels=str(message.labels)
-        )
-        session.add(mail)
-        session.commit()    
+    add_to_db(emails)
 
 
-def get_emails():
+def get_db_emails():
     return session.query(Mail).all()
 
 if __name__ == "__main__":
     load_env()
     make_db_session()
     gmail = Gmail()
-    print(get_emails())
+    sync_emails(gmail)
+    print(get_db_emails())
 
