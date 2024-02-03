@@ -148,15 +148,11 @@ def is_valuable(chunk):
         return False
 
 def store_embeddings(chunks, embeddings):
-    new_chunks = []
-    for chunk in chunks:
-        if is_valuable(chunk):
-            new_chunks.append(chunk)
-    print("this ",len(new_chunks))
+    print("this ",len(chunks))
     collection = chromadb_instance.get_or_create_collection(COLLECTION_NAME,
                                                         metadata={"hnsw:space": SIMILARITY_SEARCH_TYPE})
-    ids = [str(uuid.uuid1()) for _ in range(len(new_chunks))]
-    for i, chunk in enumerate(new_chunks):
+    ids = [str(uuid.uuid1()) for _ in range(len(chunks))]
+    for i, chunk in enumerate(chunks):
         collection.add(documents=chunk, embeddings=embeddings[i], ids=[ids[i]])
     return ids
 
@@ -170,11 +166,21 @@ def get_db_emails():
 def get_latest_email():
     return session.query(Mail).order_by(Mail.date.desc()).first()
 
+def refine_chunks(chunks, mail):
+    mail_metadata = "From: " + mail.sender + "\n" + "To: " + mail.recipient + "\n" + "Subject: " + mail.subject + "\n" + "Date: " + mail.date + "\n\n Message: \n"
+    new_chunks = []
+    for chunk in chunks:
+        if is_valuable(chunk):
+            chunk = mail_metadata + chunk
+            new_chunks.append(chunk)
+    return new_chunks
+
 if __name__ == "__main__":
     make_db_session()
     make_chroma_session()
     gmail = Gmail()
     chunks = split_mail(get_latest_email().message)
+    chunks = refine_chunks(chunks, get_latest_email())
     print(chunks)
     mail_embeddings = embed_mail(chunks)
     ids = store_embeddings(chunks, mail_embeddings)
