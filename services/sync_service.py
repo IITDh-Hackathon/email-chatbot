@@ -49,9 +49,8 @@ class Mail(Base):
         return f"<Mail(message_id={self.message_id}, sender={self.sender}, recipient={self.recipient}, subject={self.subject}, date={self.date}, message={self.message})>"
 
 
-gmail = Gmail()
 
-def sync_emails():
+def sync_emails(gmail):
     # messages = gmail.get_unread_messages(query=construct_query(query_params))
     query_params = {
         "newer_than": (2, "day"),
@@ -79,5 +78,6 @@ def get_emails():
 if __name__ == "__main__":
     load_env()
     make_db_session()
+    gmail = Gmail()
     print(get_emails())
 
