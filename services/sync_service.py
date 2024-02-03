@@ -265,7 +265,10 @@ def main_loop():
 if __name__ == "__main__":
     make_db_session()
     make_chroma_session()
-    gmail = Gmail()
+    gmail = Gmail(
+        client_secret_file="../client_secret.json",
+        creds_file="../gmail_token.json",
+    )
     while True:
         main_loop()
         time.sleep(60)
