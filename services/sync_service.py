@@ -128,7 +128,7 @@ def get_latest_email_id():
 
 def sync_emails(gmail_client : Gmail):
     query_params = {
-        "newer_than": (1, "day"),
+        "newer_than": (4, "day"),
     }
     emails = gmail_client.get_messages(query=construct_query(query_params))
     latest_email_id = get_latest_email_id()
@@ -206,14 +206,10 @@ def get_event_data(mail_str,sender):
         response=response.content
         response = response.strip().lower()
         print(response)
-        if "no" in response:
-            print("No event")
-            return False
-        else:
-            json_response = json.loads(response)
-            json_response["sender"] = sender
-            add_event_to_db(json_response)
-            return True
+        json_response = json.loads(response)
+        json_response["sender"] = sender
+        add_event_to_db(json_response)
+        return True
     except Exception as e:
         print(e)
         return False
@@ -255,7 +251,7 @@ def main_loop():
         chunks = split_mail(mail.message)
         chunks,event_chunks = refine_chunks(chunks, mail)
         mail_string = ' '.join(event_chunks)
-        if classify_event(mail_string) == "yes":
+        if classify_event(mail_string):
             get_event_data(mail_string,mail.sender)
         mail_embeddings = embed_mail(chunks)
         store_embeddings(chunks, mail_embeddings)

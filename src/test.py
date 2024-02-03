@@ -1,5 +1,5 @@
 from textual.app import App, ComposeResult
-from textual.widgets import Static,Collapsible, Footer, Label, Markdown
+from textual.widgets import Static,Collapsible, Footer, Label, Scrollable
 
 
 class HorizontalLayoutExample(App):
