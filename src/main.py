@@ -12,8 +12,15 @@ from rich import box
 from rich.padding import Padding
 import time
 
+import os
+print(os.getcwd())
+from utils.llm_query import *
+
+query = "Is there any talk on Knowledge production or creation of new knowledge scheduled?"
+print(query_response(query))
+
 console = Console()
-console.clear()
+# console.clear()
 
 layout = Layout()
 
@@ -91,7 +98,7 @@ dict = {
     "Event 3": "12:00 Feb 20 2021"
 }
 # print date and time in the right pane
-display_events(dict)
+# display_events(dict)
 
 mails=[
     {
@@ -114,7 +121,7 @@ mails=[
     }
 ]
 
-display_emails(mails)
+# display_emails(mails)
 
 # print_text("Hello World")
-print(layout)
+# print(layout)

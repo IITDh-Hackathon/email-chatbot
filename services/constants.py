@@ -16,7 +16,11 @@ Give output as "true" or "false" without quotes.
 """
 
 IS_EVENT_PROMPT = """
-You are a event classifying system and you have this information: {mail_chunk}. if the given information does not pertain to an academic event, reply 'no'. Otherwise give the academic event details in given format (strictly json) and if there is a gmeet link in the information keep the event_venue as online, if any one of the details are missing fill it as not available
+You are a event classifying system and you have this information: 
+{mail_chunk}
+
+Give the academic event details in given format (strictly given json) and if there is a gmeet link in the information keep the event_venue as online, if any one of the details are missing fill it as not available
+event_date format is yyyy-mm-dd strictly. event_time should follow 24hour format. example 13:16. 
 	{{
 	   "event_name":"",
 	   "event_date":"",
@@ -25,7 +29,13 @@ You are a event classifying system and you have this information: {mail_chunk}. 
 	}} 
 """
 
-EVENT_CLASSIFIER_PROMPT = "You are a event classfier. You should classfify the received email - {mail_chunk} as yes, if it is event otherwise as 'no'.Only reply the single word, remove the unwanted explination."
+EVENT_CLASSIFIER_PROMPT = """You are a event classfier. You should only answer yes/no strictly.
+ You should classfify the received email :
+ {mail_chunk} 
+ 
+ as yes, if the above email contains any talk/workshop/online meets/meetup or any upcoming fest related information. 
+ Specifically lookout for online trainings, Annual progress seminar(APS), Seminars, Pre-synopsis, research related and personal meetings. 
+"""
 
 CHUNK_SIZE = 2500
 CHUNK_OVERLAP = 100
