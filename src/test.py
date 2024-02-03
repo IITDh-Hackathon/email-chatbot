@@ -10,12 +10,11 @@ class HorizontalLayoutExample(App):
         yield Static("Three", classes="box")
         
 class MainApp(App):
-    
     def compose(self)->ComposeResult:
         yield HorizontalLayoutExample()
     
 
 
 if __name__ == "__main__":
-    app = MainApp()
+    app = HorizontalLayoutExample()
     app.run()
