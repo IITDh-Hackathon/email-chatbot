@@ -10,7 +10,6 @@ class HorizontalLayoutExample(App):
         yield Static("Three", classes="box")
         
 class MainApp(App):
-    
     def compose(self)->ComposeResult:
         yield HorizontalLayoutExample()
     
