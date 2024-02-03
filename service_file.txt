@@ -1,0 +1,13 @@
+# /etc/systemd/system/myscript.service
+
+[Unit]
+Description=My Script Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=./script.sh
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
