@@ -3,6 +3,13 @@ from rich.live import Live
 from rich.table import Table
 from rich import print
 from rich.layout import Layout
+from rich.console import Group
+from typing import List
+#import box
+from rich.panel import Panel
+from rich.text import Text
+from rich import box
+from rich.padding import Padding
 import time
 
 console = Console()
@@ -12,6 +19,7 @@ layout = Layout()
 
 # Left Pane
 left_pane = Layout(name="left", ratio=25)
+
 
 
 # code for rich layout
@@ -25,19 +33,29 @@ layout.split_row(
     Layout(name="right", ratio=27),
 )
 
+def display_emails(emails: List[dict]):
+    all_emails = []
+    for email in emails:
+        top = Text.assemble(f"{email['from']}       {email['time']}")
+        middle = Text.assemble( f"{email['subject']}")
+        bottom = Text.assemble( f"{email['preview']}")
+        all_emails.append(Group(top, middle, bottom))
+    layout["left"].update(Group(*all_emails))
 
-def show_events(events: dict):
-    event_table = Table()
+def display_events(events: dict):
+    event_table = Table(box=box.ROUNDED)
     event_table.title = "Upcoming Events"
     event_table.add_column("Event", width=20,style="cyan")
     event_table.min_width = 33
     event_table.add_column("Time", width=13,style="magenta")
     # for event, time in events.items():
     #     event_table.add_row(event, time)
-    with Live(event_table, refresh_per_second=4):
-        for event, times in events.items():
-            event_table.add_row(event, times)
-            time.sleep(0.5)
+    # with Live(event_table, refresh_per_second=4):
+    #     for event, times in events.items():
+    #         event_table.add_row(event, times)
+    #         time.sleep(0.5)
+    for event, time in events.items():
+        event_table.add_row(event, time)
     layout["right"].update(event_table)
 
 
@@ -67,19 +85,36 @@ def start_console():
     #         '[italic][bold][#FF00FF]Bot :[/#FF00FF][/bold][/italic] Hey Welcome to Email Chatbot. How may I help you', )
     # )
 
-
-# start_console()
-# # print(layout)
-# # create a object with __rich__ console__meth
-# create a dict with key as eenvent and value as time
 dict = {
     "Event 1": "10:00 Feb 20 2021",
     "Event 2": "11:00 Feb 20 2021",
     "Event 3": "12:00 Feb 20 2021"
 }
 # print date and time in the right pane
-show_events(dict)
+display_events(dict)
 
+mails=[
+    {
+        "from": "email1",
+        "subject": "subject1",
+        "preview": "preview1",
+        "time": "time1"
+    },
+    {
+        "from": "email2",
+        "subject": "subject2",
+        "preview": "preview2",
+        "time": "time2"
+    },
+    {
+        "from": "email3",
+        "subject": "subject3",
+        "preview": "preview3",
+        "time": "time3"
+    }
+]
+
+display_emails(mails)
 
 # print_text("Hello World")
 print(layout)
