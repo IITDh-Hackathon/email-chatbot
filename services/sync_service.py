@@ -178,6 +178,24 @@ def is_valuable(chunk):
         print(e)
         return False
 
+def classify_event(mail_str):
+    try:
+        prompt = PromptTemplate(input_variables=["mail_chunk"],template=EVENT_CLASSIFIER_PROMPT)
+        llm = ChatOpenAI(model_name="gpt-4")
+        output = prompt | llm
+        response = output.invoke({"mail_chunk": mail_str})
+        response = response.content
+        response = response.strip().lower()
+        print(response)
+        if "yes" in response:
+            return True
+        else:
+            return False
+    except Exception as e:
+        print(e)
+        return False
+
+
 def is_event(mail_str,sender):
     try:
         prompt = PromptTemplate(input_variables=["mail_chunk"],template=IS_EVENT_PROMPT)
@@ -238,6 +256,8 @@ def main_loop():
         chunks = split_mail(mail.message)
         chunks,event_chunks = refine_chunks(chunks, mail)
         mail_string = ' '.join(event_chunks)
+        print("event is classified as: ")
+        print(classify_event(mail_string))
         is_event(mail_string,mail.sender)
         mail_embeddings = embed_mail(chunks)
         ids = store_embeddings(chunks, mail_embeddings)

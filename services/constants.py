@@ -25,5 +25,7 @@ You are a event classifying system and you have this information: {mail_chunk}. 
 	}} 
 """
 
+EVENT_CLASSIFIER_PROMPT = "You are a event classfier. You should classfify the received email - {mail_chunk} as yes, if it is event otherwise as 'no'.Only reply the single word, remove the unwanted explination."
+
 CHUNK_SIZE = 2500
 CHUNK_OVERLAP = 100
