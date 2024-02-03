@@ -1,37 +1,16 @@
-from rich import print
-from rich.panel import Panel
-from rich.layout import Layout
-from rich.console import Console
-from rich.text import Text
-from rich.table import Table, Column
-from rich.live import Live
-from time import sleep
+from textual.app import App, ComposeResult
+from textual.widgets import Static,Collapsible, Footer, Label, Markdown
 
 
-console = Console()
-console.set_alt_screen(True)
-console.clear()
+class HorizontalLayoutExample(App):
+    CSS_PATH = "grid.tcss"
 
-layout = Layout()
+    def compose(self) -> ComposeResult:
+        yield Static("One", classes="box")
+        yield Static("Two", classes="box")
+        yield Static("Three", classes="box")
 
-logs_table = Table(Column("Logs"), expand=True)
 
-layout.split_column(
-    Layout(name="header", ratio=4),
-    Layout(logs_table, name="body", ratio=6)
-)
-
-header = layout.get('header')
-
-header.split_row(
-    Layout(Panel(''), name="account-info"),
-    Layout(Panel(''), name="bot-status-info")
-)
-
-live = Live(layout, refresh_per_second=1)
-live.start()
-
-for i in range(30):
-    logs_table.add_row(f'Test line {i}.')
-
-sleep(5)
+if __name__ == "__main__":
+    app = HorizontalLayoutExample()
+    app.run()
