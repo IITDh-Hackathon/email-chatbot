@@ -2,3 +2,5 @@ _pycache_
 venv/
 .env
 services/gmail_token.json
+chroma.db
+services/__pycache__/
