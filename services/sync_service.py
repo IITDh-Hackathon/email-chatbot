@@ -49,22 +49,24 @@ gmail = Gmail()
 
 # messages = gmail.get_unread_messages(query=construct_query(query_params))
 
+query_params = {
+    "newer_than": (2, "day"),
+}
+# emails = gmail.get_messages(query=construct_query(query_params))
 
-emails = gmail.get_messages(query=construct_query(query_params))
-
-for message in emails:
-    mail = Mail(
-        message_id=str(message.id),
-        thread_id=str(message.thread_id),
-        sender=message.sender,
-        recipient=message.recipient,
-        subject=message.subject,
-        date=message.date,
-        message=message.plain,
-        # labels=str(message.labels)
-    )
-    session.add(mail)
-    session.commit()
+# for message in emails:
+#     mail = Mail(
+#         message_id=str(message.id),
+#         thread_id=str(message.thread_id),
+#         sender=message.sender,
+#         recipient=message.recipient,
+#         subject=message.subject,
+#         date=message.date,
+#         message=message.plain,
+#         # labels=str(message.labels)
+#     )
+#     session.add(mail)
+#     session.commit()
 
 
 result = session.query(Mail).all()
