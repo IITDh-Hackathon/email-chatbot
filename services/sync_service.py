@@ -1,7 +1,7 @@
 import os
 import uuid
 import json
-import time
+import time, re
 
 from simplegmail import Gmail
 import sqlalchemy
@@ -126,22 +126,50 @@ def get_latest_email_id():
         print(e)
         return None
 
+def format_email(message):
+    pattern = r"(On (Sun|Mon|Tue|Wed|Thu|Fri|Sat))"
+    # Find the first occurrence of the pattern
+    match = re.search(pattern, message)
+    if match:
+        # Get the starting index of the matched pattern
+        start_index = match.start()
+        # Return the substring of the message before the matched pattern
+        return message[:start_index]
+    else:
+        # If the pattern is not found, return the original message
+        return message
+
+        
+    
+
 def sync_emails(gmail_client : Gmail):
     query_params = {
-        "newer_than": (4, "day"),
+        "newer_than": (1, "day"),
     }
     emails = gmail_client.get_messages(query=construct_query(query_params))
     latest_email_id = get_latest_email_id()
     # print("Latest email id: ", latest_email_id)
     #only add new emails to the database
-    latest_emails=[]
-    for email in emails:
+    corrupted_emails,latest_emails = [],[]
+    for email in corrupted_emails:
         if email.id == latest_email_id:
             break
-        latest_emails.append(email)
+        corrupted_emails.append(email)
+    for email in corrupted_emails:
+        cur_thread = email.thread_id
+        #find if thread id is already in the database
+        thread = session.query(Mail).filter(Mail.thread_id == cur_thread).first()
+        if thread:
+            print("before mail: ", email.plain)
+            latest_email = format_email(email.plain)
+            print("after mail: ", latest_email)
+            email.plain = latest_email
+            latest_emails.append(email)
+        else:
+            latest_emails.append(email)
     return add_to_db(latest_emails)
 
-    
+
 def print_only(emails):
     for email in emails:
         print("Message ID: ", email.message_id)
@@ -245,6 +273,7 @@ def refine_chunks(chunks, mail):
     return new_chunks,event_chunks
 
 def main_loop():
+    print(get_latest_email())
     new_mails = sync_emails(gmail)
     for mail in new_mails:
         print(mail)
