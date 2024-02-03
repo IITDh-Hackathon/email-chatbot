@@ -15,10 +15,11 @@ import time
 import os
 print(os.getcwd())
 from utils.llm_query import *
+from utils.events import *
 
 query = "Is there any talk on Knowledge production or creation of new knowledge scheduled?"
 print(query_response(query))
-
+print(get_events())
 console = Console()
 # console.clear()
 
