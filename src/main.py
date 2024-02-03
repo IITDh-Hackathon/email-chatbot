@@ -5,7 +5,7 @@ from rich import print
 from rich.layout import Layout
 from rich.console import Group
 from typing import List
-#import box
+from utils.events import *
 from rich.panel import Panel
 from rich.text import Text
 from rich import box
@@ -121,7 +121,9 @@ mails=[
     }
 ]
 
-# display_emails(mails)
+events = get_events()
+print(events)
+# display_events(events)
 
 # print_text("Hello World")
 # print(layout)
