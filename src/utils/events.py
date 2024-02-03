@@ -10,7 +10,7 @@ host = "localhost"
 port = "5432"
 
 # Specify the table name you want to read from
-def dispaly_events():
+def get_events():
     table_name = "event"
 
     # Connect to the PostgreSQL database
