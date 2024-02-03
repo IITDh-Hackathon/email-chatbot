@@ -196,7 +196,7 @@ def classify_event(mail_str):
         return False
 
 
-def is_event(mail_str,sender):
+def get_event_data(mail_str,sender):
     try:
         prompt = PromptTemplate(input_variables=["mail_chunk"],template=IS_EVENT_PROMPT)
         llm = ChatOpenAI(model_name="gpt-4")
@@ -220,7 +220,6 @@ def is_event(mail_str,sender):
 
 
 def store_embeddings(chunks, embeddings):
-    print("this ",len(chunks))
     collection = chromadb_instance.get_or_create_collection(COLLECTION_NAME,
                                                         metadata={"hnsw:space": SIMILARITY_SEARCH_TYPE})
     ids = [str(uuid.uuid1()) for _ in range(len(chunks))]
@@ -256,11 +255,10 @@ def main_loop():
         chunks = split_mail(mail.message)
         chunks,event_chunks = refine_chunks(chunks, mail)
         mail_string = ' '.join(event_chunks)
-        print("event is classified as: ")
-        print(classify_event(mail_string))
-        is_event(mail_string,mail.sender)
+        if classify_event(mail_string) == "yes":
+            get_event_data(mail_string,mail.sender)
         mail_embeddings = embed_mail(chunks)
-        ids = store_embeddings(chunks, mail_embeddings)
+        store_embeddings(chunks, mail_embeddings)
 
 if __name__ == "__main__":
     make_db_session()

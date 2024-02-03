@@ -1,2 +1,0 @@
-COLLECTION_NAME = "mail_embeddings"
-SIMILARITY_SEARCH_TYPE = "l2"
