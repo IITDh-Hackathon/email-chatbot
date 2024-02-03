@@ -16,11 +16,14 @@ Give output as "true" or "false" without quotes.
 """
 
 IS_EVENT_PROMPT = """
-You are a event classifying system and you have this information - {}. if the given information is not an event then reply 'no', else give the available event details in given format and if there is a gmeet link in the information keep the event_venue as online, if any one of the details are missing fill it as not available
+You are a event classifying system and you have this information: {mail_chunk}. if the given information does not pertain to an academic event, reply 'no'. Otherwise give the academic event details in given format (strictly json) and if there is a gmeet link in the information keep the event_venue as online, if any one of the details are missing fill it as not available
 	{{
-	   event_name:
-	   event_date:
-	   event_time:
-	   event_venue:
+	   "event_name":"",
+	   "event_date":"",
+	   "event_time":"",
+	   "event_venue":
 	}} 
 """
+
+CHUNK_SIZE = 2500
+CHUNK_OVERLAP = 100
