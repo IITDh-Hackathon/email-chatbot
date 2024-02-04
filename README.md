@@ -91,7 +91,7 @@ Please wait few minutes before starting CLI, as the sync service needs to downlo
 - LangChains 
 - OpenAI LLMs (GPT-3.5 and GPT-4)
 - Textual UI (For Terminal UI)
-- 
+- [Simplegmail](https://github.com/jeremyephron/simplegmail)(Gmail api client)
 
 ## Authors
 
