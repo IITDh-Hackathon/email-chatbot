@@ -1,7 +1,14 @@
 from textual.app import App, ComposeResult
+from textual.events import Mount
+from textual.widgets import Static,Collapsible, Footer, Label, Markdown, DataTable, TextArea, Button
+from textual.containers import ScrollableContainer, Vertical
 from textual.widgets import Static,Collapsible, Footer, Label, Markdown, DataTable
 from textual.containers import ScrollableContainer
+from textual.reactive import reactive
 from utils.events import *
+from utils.llm_query import *
+
+
 
 Rows=[("Event" , "Time")]
 
@@ -50,15 +57,47 @@ class CollapsibleApp(Static):
         for child in self.walk_children(Collapsible):
             child.collapsed = collapse
 
+class ResponseBox(Static):
+    query = reactive("")
+    
+    def on_mount(self, event: Mount) -> None:
+        self.update("Please enter a query above and click submit")
+
+class ChatResponse(Static):
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        """Event handler called when a button is pressed."""
+        button_id = event.button.id
+        text_display = self.query_one(ResponseBox)
+        text_area = self.query_one(TextArea)
+        input_text = text_area.text
+        text_area.text = ""
+        text_display.update(query_response(input_text))
+    def compose(self) -> ComposeResult:
+        with Vertical():
+            with ScrollableContainer():
+                yield TextArea(id="chat-input")
+                yield Button("Submit Query", id="chat-bot-response-button")
+                yield ResponseBox(id="chat-bot-response")
+
+    def on_mount(self) -> None:
+        pass
+
+class ChatComponent(Static):
+    def compose(self) -> ComposeResult:
+        with Vertical():
+            yield ChatResponse()
+
+    def on_mount(self) -> None:
+        pass
 
 class MainApp(App):
     CSS_PATH = "grid.tcss"
     def compose(self) -> ComposeResult:
-        yield Footer()
         yield ScrollableContainer(Static("All Emails"),CollapsibleApp())
-        yield Static("Two", classes="box")
+        yield Vertical(Static("Chat Bot"), ChatComponent(classes="box"))
         yield ScrollableContainer(Static("All Events"),TableApp())
-        
+        yield Footer()
+
 
 if __name__ == "__main__":
     app = MainApp()

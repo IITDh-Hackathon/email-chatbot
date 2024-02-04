@@ -2,6 +2,7 @@ import os
 import uuid
 import json
 import time, re
+from icecream import ic
 
 from simplegmail import Gmail
 import sqlalchemy
@@ -74,7 +75,7 @@ class Mail(Base):
     message = Column(String)
 
     def __repr__(self):
-        return f"<Mail(message_id={self.message_id}, sender={self.sender}, recipient={self.recipient}, subject={self.subject}, date={self.date}, message={self.message})>"
+        return f"<Mail(message_id={self.message_id}, sender={self.sender}, recipient={self.recipient}, subject={self.subject}, date={self.date})>\n\n"
 
 class Event(Base):
     __tablename__ = 'event'
@@ -90,6 +91,7 @@ class Event(Base):
         return f"<Event(event_name={self.event_name}, event_date={self.event_date}, event_time={self.event_time}, event_venue={self.event_venue})>"
     
 def add_to_db(emails):
+    ic(emails)
     ret = []
     for email in emails:
         mail = Mail(
@@ -151,10 +153,11 @@ def sync_emails(gmail_client : Gmail):
     # print("Latest email id: ", latest_email_id)
     #only add new emails to the database
     corrupted_emails,latest_emails = [],[]
-    for email in corrupted_emails:
+    for email in emails:
         if email.id == latest_email_id:
             break
         corrupted_emails.append(email)
+    ic(corrupted_emails)
     for email in corrupted_emails:
         cur_thread = email.thread_id
         #find if thread id is already in the database
@@ -166,6 +169,7 @@ def sync_emails(gmail_client : Gmail):
             email.plain = latest_email
             latest_emails.append(email)
         else:
+            print("thread not found")
             latest_emails.append(email)
     return add_to_db(latest_emails)
 
@@ -273,8 +277,8 @@ def refine_chunks(chunks, mail):
     return new_chunks,event_chunks
 
 def main_loop():
-    print(get_latest_email().date)
     new_mails = sync_emails(gmail)
+    print(new_mails)
     for mail in new_mails:
         print(mail)
         chunks = split_mail(mail.message)
