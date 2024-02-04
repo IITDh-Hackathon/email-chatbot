@@ -7,3 +7,29 @@ Screen {
     width: 1fr;
     border: solid green;
 }
+
+.chat1 {
+    
+}
+
+#chat-bot-response-header {
+    text-align: center;
+    background: blue;
+    padding: 1;
+    margin: 1;
+}
+
+#chat-bot-response {
+    color: magenta;
+    background: yellow;
+    height: 10;
+    text-align: center;
+    padding: 1;
+    margin: 1;
+}
+
+#chat-input {
+    background: black;
+    color: white;
+    height: 4;
+}
