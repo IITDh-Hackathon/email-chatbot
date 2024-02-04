@@ -81,7 +81,6 @@ def get_mails():
         count += 1
     cursor.close()
     conn.close()
-    print(emails[0]["time"])
     return emails
 
 get_mails()
