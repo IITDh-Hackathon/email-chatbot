@@ -146,7 +146,7 @@ def format_email(mess):
 
 def sync_emails(gmail_client : Gmail):
     query_params = {
-        "newer_than": (1, "day"),
+        "newer_than": (10, "day"),
     }
     emails = gmail_client.get_messages(query=construct_query(query_params))
     latest_email_id = get_latest_email_id()
