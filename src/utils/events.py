@@ -32,7 +32,7 @@ def get_events():
     events = []
     count = 0
     for my_tuple in rows:
-        if count == 10:
+        if count == 20:
             break
         result_dict = {
         "Event": my_tuple[1],
@@ -69,7 +69,7 @@ def get_mails():
     emails = []
     count = 0
     for my_tuple in rows:
-        if count == 15:
+        if count == 40:
             break
         result_dict = {
         "from": my_tuple[2],

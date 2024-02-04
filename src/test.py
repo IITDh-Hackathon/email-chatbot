@@ -14,18 +14,19 @@ Rows=[("Event" , "Time")]
 
 all_events = get_events()
 
-all_mails = get_mails().sort(key=lambda x: x["time"], reverse=True)
+all_mails = get_mails()
+all_mails.sort(key=lambda x: x["time"], reverse=True)
 
 for event in all_events:
     Rows.append((event["Event"],event["Time"]))
 
-def shorten_text(text: str, max_length: int = 50) -> str:
+def shorten_text(text: str, max_length: int = 19) -> str:
     """Shorten text to max_length."""
     if len(text) <= max_length:
         return text
-    return text[:max_length] + "..."
+    return text[:max_length] + ".."
 
-shortened_rows = [(shorten_text(row[0]), row[1]) for row in Rows]
+shortened_rows = [(shorten_text(row[0]),row[1]) for row in Rows]
 
 Rows = shortened_rows
 
