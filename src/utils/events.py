@@ -73,7 +73,7 @@ def get_mails():
             break
         result_dict = {
         "from": my_tuple[2],
-        "time": my_tuple[3] +"-"+ my_tuple[2],
+        "time": my_tuple[5],
         "subject": my_tuple[4],
         "message": my_tuple[6]
         }
