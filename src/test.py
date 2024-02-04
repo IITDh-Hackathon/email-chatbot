@@ -24,6 +24,8 @@ Rows=[("Event" , "Time")]
 
 all_events = get_events()
 
+all_mails = get_mails()
+
 for event in all_events:
     Rows.append((event["Event"],event["Time"]))
 
@@ -47,11 +49,15 @@ class CollapsibleApp(Static):
 
     def compose(self) -> ComposeResult:
         """Compose app with collapsible containers."""
-        with Collapsible(collapsed=False, title="Leto"):
-            yield Label(LETO)
-        yield Collapsible(Markdown(JESSICA), collapsed=False, title="Jessica")
-        with Collapsible(collapsed=True, title="Paul"):
-            yield Markdown(PAUL)
+        # with Collapsible(collapsed=False, title="Leto"):
+        #     yield Label(LETO)
+        # yield Collapsible(Markdown(JESSICA), collapsed=False, title="Jessica")
+        # with Collapsible(collapsed=True, title="Paul"):
+        #     yield Markdown(PAUL)
+        for mail in all_mails:
+            with Collapsible(collapsed=True, title=mail["subject"]):
+                yield Label(f"From: {mail['from']}      Time: {mail['time']}\n{mail['subject']}\n{mail['message']}\n")
+                            
 
     def action_collapse_or_expand(self, collapse: bool) -> None:
         for child in self.walk_children(Collapsible):
