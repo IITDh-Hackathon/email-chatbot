@@ -277,7 +277,6 @@ def refine_chunks(chunks, mail):
     return new_chunks,event_chunks
 
 def main_loop():
-    print("latest_email in db: \n", get_latest_email())
     new_mails = sync_emails(gmail)
     print(new_mails)
     for mail in new_mails:
