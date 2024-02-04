@@ -1,130 +1,105 @@
-from rich.console import Console
-from rich.live import Live
-from rich.table import Table
-from rich import print
-from rich.layout import Layout
-from rich.console import Group
-from typing import List
+from textual.app import App, ComposeResult
+from textual.events import Mount
+from textual.widgets import Static,Collapsible, Footer, Label, Markdown, DataTable, TextArea, Button
+from textual.containers import ScrollableContainer, Vertical
+from textual.widgets import Static,Collapsible, Footer, Label, Markdown, DataTable
+from textual.containers import ScrollableContainer
+from textual.reactive import reactive
 from utils.events import *
-from rich.panel import Panel
-from rich.text import Text
-from rich import box
-from rich.padding import Padding
-import time
-
-import os
-print(os.getcwd())
 from utils.llm_query import *
-from utils.events import *
-
-query = "Is there any talk on Knowledge production or creation of new knowledge scheduled?"
-print(query_response(query))
-print(get_events())
-console = Console()
-# console.clear()
-
-layout = Layout()
-
-# Left Pane
-left_pane = Layout(name="left", ratio=25)
 
 
 
-# code for rich layout
-layout = Layout()
-# event_table = Table()
-# event_table.add_column("ID")
-# event_table.add_column("Description")
-layout.split_row(
-    Layout(name="left", ratio=27),
-    Layout(name="middle", ratio=46),
-    Layout(name="right", ratio=27),
-)
+Rows=[("Event" , "Time")]
 
-def display_emails(emails: List[dict]):
-    all_emails = []
-    for email in emails:
-        top = Text.assemble(f"{email['from']}       {email['time']}")
-        middle = Text.assemble( f"{email['subject']}")
-        bottom = Text.assemble( f"{email['preview']}")
-        all_emails.append(Group(top, middle, bottom))
-    layout["left"].update(Group(*all_emails))
+all_events = get_events()
 
-def display_events(events: dict):
-    event_table = Table(box=box.ROUNDED)
-    event_table.title = "Upcoming Events"
-    event_table.add_column("Event", width=20,style="cyan")
-    event_table.min_width = 33
-    event_table.add_column("Time", width=13,style="magenta")
-    # for event, time in events.items():
-    #     event_table.add_row(event, time)
-    # with Live(event_table, refresh_per_second=4):
-    #     for event, times in events.items():
-    #         event_table.add_row(event, times)
-    #         time.sleep(0.5)
-    for event, time in events.items():
-        event_table.add_row(event, time)
-    layout["right"].update(event_table)
+all_mails = get_mails()
+all_mails.sort(key=lambda x: x["time"], reverse=True)
+
+for event in all_events:
+    Rows.append((event["Event"],event["Time"]))
+
+def shorten_text(text: str, max_length: int = 19) -> str:
+    """Shorten text to max_length."""
+    if len(text) <= max_length:
+        return text
+    return text[:max_length] + ".."
+
+shortened_rows = [(shorten_text(row[0]),row[1]) for row in Rows]
+
+Rows = shortened_rows
+
+class TableApp(Static):
+    def compose(self) -> ComposeResult:
+        yield DataTable()
+
+    def on_mount(self) -> None:
+        table = self.query_one(DataTable)
+        table.add_columns(*Rows[0])
+        table.add_rows(Rows[1:])
+
+class CollapsibleApp(Static):
+    """An example of collapsible container."""
+
+    BINDINGS = [
+        ("c", "collapse_or_expand(True)", "Collapse All"),
+        ("e", "collapse_or_expand(False)", "Expand All"),
+    ]
+
+    def compose(self) -> ComposeResult:
+        """Compose app with collapsible containers."""
+        for mail in all_mails:
+            with Collapsible(collapsed=True, title=mail["subject"]):
+                yield Label(f"From: {mail['from']}      Time: {mail['time']}\n{mail['subject']}\n{mail['message']}\n")
+                            
+
+    def action_collapse_or_expand(self, collapse: bool) -> None:
+        for child in self.walk_children(Collapsible):
+            child.collapsed = collapse
+
+class ResponseBox(Static):
+    query = reactive("")
+    
+    def on_mount(self, event: Mount) -> None:
+        self.update("Please enter a query above and click submit")
+
+class ChatResponse(Static):
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        """Event handler called when a button is pressed."""
+        button_id = event.button.id
+        text_display = self.query_one(ResponseBox)
+        text_area = self.query_one(TextArea)
+        input_text = text_area.text
+        text_area.text = ""
+        text_display.update(query_response(input_text))
+    def compose(self) -> ComposeResult:
+        with Vertical():
+            with ScrollableContainer():
+                yield TextArea(id="chat-input")
+                yield Button("Submit Query", id="chat-bot-response-button")
+                yield ResponseBox(id="chat-bot-response")
+
+    def on_mount(self) -> None:
+        pass
+
+class ChatComponent(Static):
+    def compose(self) -> ComposeResult:
+        with Vertical():
+            yield ChatResponse()
+
+    def on_mount(self) -> None:
+        pass
+
+class MainApp(App):
+    CSS_PATH = "grid.tcss"
+    def compose(self) -> ComposeResult:
+        yield ScrollableContainer(Static("All Emails"),CollapsibleApp())
+        yield Vertical(Static("Chat Bot"), ChatComponent(classes="box"))
+        yield ScrollableContainer(Static("All Events"),TableApp())
+        yield Footer()
 
 
-# def print_text(text):
-#     for char in text:
-#         # Print the character without buffering
-#         print(char, end='', flush=True)
-#         time.sleep(0.1)  # Adjust the sleep duration as needed
-
-
-def start_console():
-    # console.print(f'*** Email ChatBot ***',
-    #               style="bold red ", justify="center")
-    # # console.print('>' ,style = "italic underline blue on #ffffff")
-    # console.print(
-    #     '[italic][bold][#FF00FF]Bot :[/#FF00FF][/bold][/italic] Hey Welcome to Email Chatbot. How may I help you', )
-
-    # print the above text with in the layout="middle"
-    layout["middle"].update(
-        console.print(
-            "[bold]Center Text[/bold]", justify="center"
-        )
-    )
-
-    # layout["middle"].update(
-    #     console.print(
-    #         '[italic][bold][#FF00FF]Bot :[/#FF00FF][/bold][/italic] Hey Welcome to Email Chatbot. How may I help you', )
-    # )
-
-dict = {
-    "Event 1": "10:00 Feb 20 2021",
-    "Event 2": "11:00 Feb 20 2021",
-    "Event 3": "12:00 Feb 20 2021"
-}
-# print date and time in the right pane
-# display_events(dict)
-
-mails=[
-    {
-        "from": "email1",
-        "subject": "subject1",
-        "preview": "preview1",
-        "time": "time1"
-    },
-    {
-        "from": "email2",
-        "subject": "subject2",
-        "preview": "preview2",
-        "time": "time2"
-    },
-    {
-        "from": "email3",
-        "subject": "subject3",
-        "preview": "preview3",
-        "time": "time3"
-    }
-]
-
-events = get_events()
-print(events)
-# display_events(events)
-
-# print_text("Hello World")
-# print(layout)
+if __name__ == "__main__":
+    app = MainApp()
+    app.run()
