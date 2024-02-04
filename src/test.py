@@ -3,32 +3,24 @@ from textual.widgets import Static,Collapsible, Footer, Label, Markdown, DataTab
 from textual.containers import ScrollableContainer
 from utils.events import *
 
-LETO = """\
-# Duke Leto I Atreides
-
-Head of House Atreides."""
-
-JESSICA = """
-# Lady Jessica
-
-Bene Gesserit and concubine of Leto, and mother of Paul and Alia.
-"""
-
-PAUL = """
-# Paul Atreides
-
-Son of Leto and Jessica.
-"""
-
 Rows=[("Event" , "Time")]
 
 all_events = get_events()
 
-all_mails = get_mails()
+all_mails = get_mails().sort(key=lambda x: x["time"], reverse=True)
 
 for event in all_events:
     Rows.append((event["Event"],event["Time"]))
 
+def shorten_text(text: str, max_length: int = 50) -> str:
+    """Shorten text to max_length."""
+    if len(text) <= max_length:
+        return text
+    return text[:max_length] + "..."
+
+shortened_rows = [(shorten_text(row[0]), row[1]) for row in Rows]
+
+Rows = shortened_rows
 
 class TableApp(Static):
     def compose(self) -> ComposeResult:
@@ -49,11 +41,6 @@ class CollapsibleApp(Static):
 
     def compose(self) -> ComposeResult:
         """Compose app with collapsible containers."""
-        # with Collapsible(collapsed=False, title="Leto"):
-        #     yield Label(LETO)
-        # yield Collapsible(Markdown(JESSICA), collapsed=False, title="Jessica")
-        # with Collapsible(collapsed=True, title="Paul"):
-        #     yield Markdown(PAUL)
         for mail in all_mails:
             with Collapsible(collapsed=True, title=mail["subject"]):
                 yield Label(f"From: {mail['from']}      Time: {mail['time']}\n{mail['subject']}\n{mail['message']}\n")
