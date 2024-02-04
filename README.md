@@ -20,6 +20,8 @@ To run this `mail assistant`, you will need to add the following environment var
 
 For simplicity please copy `.env.example` to `.env`
 
+PostgresSQL is required for running the project. Make sure that username `postgres` with password `karthik` exists.
+
 ## Run Locally
 
 Clone the project
